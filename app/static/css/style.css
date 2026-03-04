@@ -1,0 +1,447 @@
+/* Brain Tumor Detection - CSS Styles */
+
+/* Variables */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #1abc9c;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --success-color: #2ecc71;
+    --light-bg: #f8f9fa;
+    --dark-text: #2c3e50;
+    --light-text: #7f8c8d;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --border-radius: 12px;
+}
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    margin-bottom: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.logo i {
+    font-size: 48px;
+    color: var(--secondary-color);
+}
+
+.logo h1 {
+    font-size: 32px;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.subtitle {
+    color: var(--light-text);
+    font-size: 16px;
+}
+
+/* Main Content */
+.main-content {
+    display: grid;
+    gap: 30px;
+}
+
+/* Upload Section */
+.upload-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.upload-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.upload-area {
+    border: 3px dashed #ddd;
+    border-radius: var(--border-radius);
+    padding: 60px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-area:hover,
+.upload-area.dragover {
+    border-color: var(--secondary-color);
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.upload-icon {
+    font-size: 64px;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+}
+
+.upload-content p {
+    color: var(--dark-text);
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.upload-content span {
+    color: var(--light-text);
+    display: block;
+    margin: 15px 0;
+}
+
+.upload-btn {
+    display: inline-block;
+    background: var(--secondary-color);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.file-info {
+    color: var(--light-text);
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+/* Preview Section */
+.preview-section {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.preview-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.preview-container {
+    display: inline-block;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+
+.preview-container img {
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+}
+
+.preview-container p {
+    color: var(--light-text);
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.analyze-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.analyze-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Results Section */
+.results-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.results-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Loading Spinner */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--secondary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading p {
+    margin-top: 20px;
+    color: var(--light-text);
+    font-size: 16px;
+}
+
+/* Results Container */
+.results-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Result Cards */
+.result-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid #eee;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.card-header i {
+    font-size: 24px;
+    color: var(--secondary-color);
+}
+
+.card-header h3 {
+    color: var(--primary-color);
+    font-size: 18px;
+}
+
+/* Prediction Card */
+.prediction-card .prediction-result {
+    text-align: center;
+    padding: 20px;
+}
+
+.status-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.status-icon i {
+    font-size: 40px;
+}
+
+.status-icon.success {
+    background: rgba(46, 204, 113, 0.1);
+}
+
+.status-icon.success i {
+    color: var(--success-color);
+}
+
+.status-icon.warning {
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.status-icon.warning i {
+    color: var(--danger-color);
+}
+
+.prediction-card.tumor-detected {
+    border-left: 4px solid var(--danger-color);
+}
+
+.prediction-card.no-tumor {
+    border-left: 4px solid var(--success-color);
+}
+
+.prediction-result h4 {
+    font-size: 24px;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.confidence {
+    color: var(--light-text);
+    font-size: 16px;
+}
+
+.confidence span {
+    font-weight: 700;
+    color: var(--secondary-color);
+}
+
+/* Probability Bars */
+.bar-container {
+    margin-bottom: 15px;
+}
+
+.bar-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: var(--dark-text);
+}
+
+.bar-label span:first-child {
+    text-transform: capitalize;
+}
+
+.bar-bg {
+    background: #f0f0f0;
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+/* Tumor Info */
+.tumor-info p {
+    margin-bottom: 10px;
+    color: var(--dark-text);
+    line-height: 1.6;
+}
+
+.tumor-info ul {
+    list-style: none;
+    margin-left: 20px;
+}
+
+.tumor-info li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 5px;
+    color: var(--light-text);
+}
+
+.tumor-info li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--secondary-color);
+}
+
+/* Recommendation Card */
+.recommendation-card p {
+    color: var(--dark-text);
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 30px;
+    margin-top: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.footer p {
+    color: var(--light-text);
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.footer p:first-child {
+    color: var(--warning-color);
+}
+
+.footer p:first-child i {
+    margin-right: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .logo h1 {
+        font-size: 24px;
+    }
+
+    .logo i {
+        font-size: 36px;
+    }
+
+    .upload-area {
+        padding: 40px 20px;
+    }
+
+    .upload-icon {
+        font-size: 48px;
+    }
+
+    .results-container {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Detection - DRDO</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <h1>Brain Tumor Detection System</h1>
+            </div>
+            <p class="subtitle">DRDO - Defence Research and Development Organisation</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <h2><i class="fas fa-upload"></i> Upload MRI Scan</h2>
+                <div class="upload-area" id="dropZone">
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <p>Drag & drop your MRI image here</p>
+                        <span>or</span>
+                        <label class="upload-btn">
+                            <input type="file" id="fileInput" accept="image/*" hidden>
+                            Browse Files
+                        </label>
+                        <p class="file-info">Supported formats: PNG, JPG, JPEG, BMP, TIFF</p>
+                    </div>
+                </div>
+                
+                <!-- Preview Section -->
+                <div class="preview-section" id="previewSection" style="display: none;">
+                    <h3>Selected Image</h3>
+                    <div class="preview-container">
+                        <img id="imagePreview" src="" alt="Preview">
+                        <p id="fileName"></p>
+                    </div>
+                    <button class="analyze-btn" id="analyzeBtn">
+                        <i class="fas fa-search"></i> Analyze Image
+                    </button>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <h2><i class="fas fa-chart-bar"></i> Analysis Results</h2>
+                
+                <!-- Loading Spinner -->
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Analyzing MRI scan...</p>
+                </div>
+                
+                <!-- Results Container -->
+                <div class="results-container" id="resultsContainer" style="display: none;">
+                    <!-- Prediction Card -->
+                    <div class="result-card prediction-card" id="predictionCard">
+                        <div class="card-header">
+                            <i class="fas fa-diagnoses"></i>
+                            <h3>Diagnosis</h3>
+                        </div>
+                        <div class="prediction-result">
+                            <div class="status-icon" id="statusIcon"></div>
+                            <h4 id="predictionClass"></h4>
+                            <p class="confidence">Confidence: <span id="confidenceValue"></span>%</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Probability Chart -->
+                    <div class="result-card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-pie"></i>
+                            <h3>Class Probabilities</h3>
+                        </div>
+                        <div class="probability-bars" id="probabilityBars"></div>
+                    </div>
+                    
+                    <!-- Tumor Information -->
+                    <div class="result-card info-card">
+                        <div class="card-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h3>Tumor Information</h3>
+                        </div>
+                        <div class="tumor-info" id="tumorInfo"></div>
+                    </div>
+                    
+                    <!-- Recommendations -->
+                    <div class="result-card recommendation-card">
+                        <div class="card-header">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>Recommendations</h3>
+                        </div>
+                        <p id="recommendation"></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p><i class="fas fa-exclamation-triangle"></i> Disclaimer: This system is for research purposes only and should not replace professional medical diagnosis.</p>
+            <p>&copy; 2024 DRDO - Brain Tumor Detection Project</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewSection = document.getElementById('previewSection');
+        const imagePreview = document.getElementById('imagePreview');
+        const fileName = document.getElementById('fileName');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resultsSection = document.getElementById('resultsSection');
+        const loading = document.getElementById('loading');
+        const resultsContainer = document.getElementById('resultsContainer');
+
+        let selectedFile = null;
+
+        // Drag and Drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                handleFile(files[0]);
+            }
+        });
+
+        // File Input
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // Handle File Selection
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                fileName.textContent = file.name;
+                previewSection.style.display = 'block';
+                resultsSection.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Analyze Button Click
+        analyzeBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                alert('Please select an image first.');
+                return;
+            }
+
+            // Show loading
+            resultsSection.style.display = 'block';
+            loading.style.display = 'flex';
+            resultsContainer.style.display = 'none';
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error analyzing image: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Display Results
+        function displayResults(data) {
+            const { prediction, tumor_info } = data;
+
+            // Update prediction card
+            const predictionCard = document.getElementById('predictionCard');
+            const statusIcon = document.getElementById('statusIcon');
+            const predictionClass = document.getElementById('predictionClass');
+            const confidenceValue = document.getElementById('confidenceValue');
+
+            if (prediction.is_tumor_detected) {
+                predictionCard.className = 'result-card prediction-card tumor-detected';
+                statusIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                statusIcon.className = 'status-icon warning';
+            } else {
+                predictionCard.className = 'result-card prediction-card no-tumor';
+                statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                statusIcon.className = 'status-icon success';
+            }
+
+            predictionClass.textContent = prediction.class.toUpperCase().replace('_', ' ');
+            confidenceValue.textContent = prediction.confidence.toFixed(2);
+
+            // Update probability bars
+            const probabilityBars = document.getElementById('probabilityBars');
+            probabilityBars.innerHTML = '';
+
+            const colors = {
+                'glioma': '#e74c3c',
+                'meningioma': '#3498db',
+                'pituitary': '#9b59b6',
+                'notumor': '#2ecc71'
+            };
+
+            for (const [className, prob] of Object.entries(prediction.probabilities)) {
+                const barContainer = document.createElement('div');
+                barContainer.className = 'bar-container';
+                barContainer.innerHTML = `
+                    <div class="bar-label">
+                        <span>${className}</span>
+                        <span>${prob.toFixed(2)}%</span>
+                    </div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width: ${prob}%; background-color: ${colors[className]}"></div>
+                    </div>
+                `;
+                probabilityBars.appendChild(barContainer);
+            }
+
+            // Update tumor info
+            const tumorInfo = document.getElementById('tumorInfo');
+            tumorInfo.innerHTML = `
+                <p><strong>Type:</strong> ${tumor_info.name}</p>
+                <p><strong>Description:</strong> ${tumor_info.description}</p>
+                <p><strong>Severity:</strong> ${tumor_info.severity}</p>
+                ${tumor_info.common_symptoms.length ? `
+                    <p><strong>Common Symptoms:</strong></p>
+                    <ul>
+                        ${tumor_info.common_symptoms.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                ` : ''}
+            `;
+
+            // Update recommendation
+            document.getElementById('recommendation').textContent = tumor_info.recommendation;
+
+            resultsContainer.style.display = 'grid';
+        }
+    </script>
+</body>
+</html>
