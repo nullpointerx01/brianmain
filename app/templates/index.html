@@ -4,275 +4,459 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brain Tumor Detection - DRDO</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <div class="background-effects">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="glow glow-3"></div>
+    </div>
+
     <div class="container">
         <!-- Header -->
-        <header class="header">
+        <header class="header glass-panel">
             <div class="logo">
-                <i class="fas fa-brain"></i>
-                <h1>Brain Tumor Detection System</h1>
+                <div class="logo-icon-container">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div>
+                    <h1>NeuralNet Diagnostics</h1>
+                    <p class="subtitle">DRDO Advanced Brain Tumor Detection System</p>
+                </div>
             </div>
-            <p class="subtitle">DRDO - Defence Research and Development Organisation</p>
+            <div class="header-status">
+                <span class="status-indicator"></span>
+                System Online
+            </div>
         </header>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Upload Section -->
-            <section class="upload-section">
-                <h2><i class="fas fa-upload"></i> Upload MRI Scan</h2>
-                <div class="upload-area" id="dropZone">
-                    <div class="upload-content">
-                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                        <p>Drag & drop your MRI image here</p>
-                        <span>or</span>
-                        <label class="upload-btn">
-                            <input type="file" id="fileInput" accept="image/*" hidden>
-                            Browse Files
-                        </label>
-                        <p class="file-info">Supported formats: PNG, JPG, JPEG, BMP, TIFF</p>
+            <!-- Left Column: Upload & Preview -->
+            <div class="left-column">
+                <section class="upload-section glass-panel">
+                    <div class="section-header">
+                        <h2><i class="fas fa-microscope"></i> Scan Input</h2>
                     </div>
-                </div>
-                
-                <!-- Preview Section -->
-                <div class="preview-section" id="previewSection" style="display: none;">
-                    <h3>Selected Image</h3>
-                    <div class="preview-container">
-                        <img id="imagePreview" src="" alt="Preview">
-                        <p id="fileName"></p>
+                    
+                    <div class="upload-area" id="dropZone">
+                        <div class="upload-content">
+                            <div class="upload-icon-wrapper">
+                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            </div>
+                            <p class="primary-text">Drag & drop MRI scan</p>
+                            <span class="secondary-text">or <label class="upload-link"><input type="file" id="fileInput" accept="image/*" hidden>browse files</label></span>
+                            <div class="file-types">
+                                <span class="badge">JPG</span>
+                                <span class="badge">PNG</span>
+                                <span class="badge">DICOM-Ready</span>
+                            </div>
+                        </div>
                     </div>
-                    <button class="analyze-btn" id="analyzeBtn">
-                        <i class="fas fa-search"></i> Analyze Image
-                    </button>
-                </div>
-            </section>
+                    
+                    <!-- Preview Section -->
+                    <div class="preview-section" id="previewSection" style="display: none;">
+                        <div class="image-container" id="imageContainer">
+                            <img id="imagePreview" src="" alt="MRI Preview">
+                            <div class="scanner-overlay" id="scannerOverlay">
+                                <div class="scanner-line"></div>
+                                <div class="scanner-burst"></div>
+                            </div>
+                        </div>
+                        <div class="file-details">
+                            <i class="fas fa-file-image"></i>
+                            <span id="fileName" class="text-truncate">scan_001.jpg</span>
+                        </div>
+                        
+                        <button class="primary-btn pulse-btn" id="analyzeBtn">
+                            <i class="fas fa-bolt"></i> Initiate Analysis
+                        </button>
+                    </div>
+                </section>
+            </div>
 
-            <!-- Results Section -->
-            <section class="results-section" id="resultsSection" style="display: none;">
-                <h2><i class="fas fa-chart-bar"></i> Analysis Results</h2>
-                
-                <!-- Loading Spinner -->
-                <div class="loading" id="loading" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Analyzing MRI scan...</p>
-                </div>
-                
-                <!-- Results Container -->
-                <div class="results-container" id="resultsContainer" style="display: none;">
-                    <!-- Prediction Card -->
-                    <div class="result-card prediction-card" id="predictionCard">
-                        <div class="card-header">
-                            <i class="fas fa-diagnoses"></i>
-                            <h3>Diagnosis</h3>
-                        </div>
-                        <div class="prediction-result">
-                            <div class="status-icon" id="statusIcon"></div>
-                            <h4 id="predictionClass"></h4>
-                            <p class="confidence">Confidence: <span id="confidenceValue"></span>%</p>
-                        </div>
+            <!-- Right Column: Results -->
+            <div class="right-column">
+                <section class="results-section glass-panel" id="resultsSection">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-network"></i> Diagnostic Output</h2>
                     </div>
                     
-                    <!-- Probability Chart -->
-                    <div class="result-card">
-                        <div class="card-header">
-                            <i class="fas fa-chart-pie"></i>
-                            <h3>Class Probabilities</h3>
+                    <!-- Initial State -->
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">
+                            <i class="fas fa-satellite-dish"></i>
                         </div>
-                        <div class="probability-bars" id="probabilityBars"></div>
+                        <p>Awaiting scan input for analysis.</p>
                     </div>
                     
-                    <!-- Tumor Information -->
-                    <div class="result-card info-card">
-                        <div class="card-header">
-                            <i class="fas fa-info-circle"></i>
-                            <h3>Tumor Information</h3>
+                    <!-- Loading State -->
+                    <div class="loading-state" id="loadingState" style="display: none;">
+                        <div class="loader-container">
+                            <div class="loader">
+                                <svg viewBox="0 0 80 80">
+                                    <circle id="test" cx="40" cy="40" r="32"></circle>
+                                </svg>
+                            </div>
+                            <div class="loader triangle">
+                                <svg viewBox="0 0 86 80">
+                                    <polygon points="43 8 79 72 7 72"></polygon>
+                                </svg>
+                            </div>
+                            <div class="loader">
+                                <svg viewBox="0 0 80 80">
+                                    <rect x="8" y="8" width="64" height="64"></rect>
+                                </svg>
+                            </div>
                         </div>
-                        <div class="tumor-info" id="tumorInfo"></div>
+                        <p class="loading-text">Processing Neural Pathways<span class="dots">...</span></p>
                     </div>
                     
-                    <!-- Recommendations -->
-                    <div class="result-card recommendation-card">
-                        <div class="card-header">
-                            <i class="fas fa-clipboard-list"></i>
-                            <h3>Recommendations</h3>
+                    <!-- Results Container -->
+                    <div class="results-container" id="resultsContainer" style="display: none;">
+                        
+                        <!-- Primary Diagnosis -->
+                        <div class="primary-result-card" id="primaryResultCard">
+                            <div class="diagnosis-header">
+                                <h3 class="diagnosis-title">Primary Diagnosis</h3>
+                                <div class="confidence-badge" id="confidenceBadge">
+                                    <i class="fas fa-check-circle"></i> High Confidence
+                                </div>
+                            </div>
+                            
+                            <div class="diagnosis-main">
+                                <div class="status-ring" id="statusRing">
+                                    <i class="fas fa-brain" id="statusIconInner"></i>
+                                </div>
+                                <div class="diagnosis-details">
+                                    <h4 id="predictionClass" class="gradient-text">Glioma Tumor</h4>
+                                    <div class="confidence-score">
+                                        <span class="score-label">Certainty:</span>
+                                        <span class="score-value" id="confidenceValue">98.5</span><span class="score-symbol">%</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p id="recommendation"></p>
+                        
+                        <!-- Probability Breakdown -->
+                        <div class="data-card probability-card">
+                            <div class="card-title">
+                                <i class="fas fa-chart-bar"></i> Probability Distribution
+                            </div>
+                            <div class="probability-bars" id="probabilityBars">
+                                <!-- Bars populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <!-- Clinical Information -->
+                        <div class="data-card info-card">
+                            <div class="card-title">
+                                <i class="fas fa-book-medical"></i> Clinical Details
+                            </div>
+                            <div class="tumor-info" id="tumorInfo">
+                                <!-- Info populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <!-- Recommendations -->
+                        <div class="data-card recommendation-card">
+                            <div class="card-title">
+                                <i class="fas fa-clipboard-check"></i> Next Steps
+                            </div>
+                            <div class="recommendation-content">
+                                <p id="recommendation"></p>
+                            </div>
+                        </div>
+                        
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </main>
 
         <!-- Footer -->
-        <footer class="footer">
-            <p><i class="fas fa-exclamation-triangle"></i> Disclaimer: This system is for research purposes only and should not replace professional medical diagnosis.</p>
-            <p>&copy; 2024 DRDO - Brain Tumor Detection Project</p>
+        <footer class="footer glass-panel">
+            <div class="footer-content">
+                <div class="warning-text">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>Research Purposed Only:</strong> This AI system is an assistive tool and must not replace professional medical diagnosis.
+                </div>
+                <div class="copyright">
+                    &copy; 2026 DRDO - Cognitive Computing Lab
+                </div>
+            </div>
         </footer>
     </div>
 
+    <!-- Need to update logic to match IDs -->
     <script>
         // DOM Elements
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
+        
         const previewSection = document.getElementById('previewSection');
         const imagePreview = document.getElementById('imagePreview');
         const fileName = document.getElementById('fileName');
+        const imageContainer = document.getElementById('imageContainer');
         const analyzeBtn = document.getElementById('analyzeBtn');
-        const resultsSection = document.getElementById('resultsSection');
-        const loading = document.getElementById('loading');
+        
+        const emptyState = document.getElementById('emptyState');
+        const loadingState = document.getElementById('loadingState');
         const resultsContainer = document.getElementById('resultsContainer');
+        const primaryResultCard = document.getElementById('primaryResultCard');
+        
+        // Colors for charts
+        const colors = {
+            'glioma': '#ef4444',     // Red
+            'meningioma': '#3b82f6', // Blue
+            'pituitary': '#8b5cf6',  // Purple
+            'notumor': '#10b981'     // Emerald
+        };
 
         let selectedFile = null;
 
+        // Visual Effects Handling
         // Drag and Drop
-        dropZone.addEventListener('dragover', (e) => {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
             e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
             dropZone.classList.add('dragover');
-        });
+            dropZone.querySelector('.upload-icon').classList.add('fa-bounce');
+        }
 
-        dropZone.addEventListener('dragleave', () => {
+        function unhighlight(e) {
             dropZone.classList.remove('dragover');
-        });
+            dropZone.querySelector('.upload-icon').classList.remove('fa-bounce');
+        }
 
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length) {
-                handleFile(files[0]);
-            }
-        });
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length) handleFile(files[0]);
+        }
 
         // File Input
         fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                handleFile(e.target.files[0]);
-            }
+            if (e.target.files.length) handleFile(e.target.files[0]);
         });
 
-        // Handle File Selection
         function handleFile(file) {
             if (!file.type.startsWith('image/')) {
-                alert('Please select an image file.');
+                alert('Invalid file format. Please select an image (JPG, PNG).');
                 return;
             }
 
             selectedFile = file;
             const reader = new FileReader();
+            
+            // Add a small delay for a smooth transition feeling
+            dropZone.style.opacity = '0.5';
+            
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
                 fileName.textContent = file.name;
-                previewSection.style.display = 'block';
-                resultsSection.style.display = 'none';
+                
+                setTimeout(() => {
+                    dropZone.style.display = 'none';
+                    previewSection.style.display = 'flex';
+                    previewSection.classList.add('fade-in');
+                    dropZone.style.opacity = '1';
+                    
+                    // Reset results area
+                    emptyState.style.display = 'flex';
+                    loadingState.style.display = 'none';
+                    resultsContainer.style.display = 'none';
+                    imageContainer.classList.remove('scanning');
+                }, 300);
             };
+            
             reader.readAsDataURL(file);
         }
 
-        // Analyze Button Click
+        // Analyze Action
         analyzeBtn.addEventListener('click', async () => {
-            if (!selectedFile) {
-                alert('Please select an image first.');
-                return;
-            }
+            if (!selectedFile) return;
 
-            // Show loading
-            resultsSection.style.display = 'block';
-            loading.style.display = 'flex';
+            // UI state change for scanning
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            imageContainer.classList.add('scanning');
+            
+            emptyState.style.display = 'none';
             resultsContainer.style.display = 'none';
+            loadingState.style.display = 'flex';
 
-            // Create form data
             const formData = new FormData();
             formData.append('file', selectedFile);
 
             try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    body: formData
-                });
-
+                // Minimum loading time for aesthetic purposes (1.5s)
+                const fetchPromise = fetch('/predict', { method: 'POST', body: formData });
+                const timerPromise = new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const [response] = await Promise.all([fetchPromise, timerPromise]);
                 const data = await response.json();
 
                 if (data.success) {
                     displayResults(data);
                 } else {
-                    alert('Error: ' + data.error);
+                    throw new Error(data.error || 'Server error occurred');
                 }
             } catch (error) {
-                alert('Error analyzing image: ' + error.message);
+                alert('Analysis Failed: ' + error.message);
+                emptyState.style.display = 'flex';
+                loadingState.style.display = 'none';
             } finally {
-                loading.style.display = 'none';
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-bolt"></i> Re-Analyze Focus';
+                imageContainer.classList.remove('scanning');
             }
         });
 
-        // Display Results
         function displayResults(data) {
+            loadingState.style.display = 'none';
+            resultsContainer.style.display = 'flex';
+            resultsContainer.classList.add('slide-up');
+            
             const { prediction, tumor_info } = data;
-
-            // Update prediction card
-            const predictionCard = document.getElementById('predictionCard');
-            const statusIcon = document.getElementById('statusIcon');
-            const predictionClass = document.getElementById('predictionClass');
-            const confidenceValue = document.getElementById('confidenceValue');
-
+            
+            // 1. Update Primary Card
+            const statusRing = document.getElementById('statusRing');
+            const predClass = document.getElementById('predictionClass');
+            const confValue = document.getElementById('confidenceValue');
+            const confBadge = document.getElementById('confidenceBadge');
+            
+            // Set values
+            const formattedClass = prediction.class.toUpperCase().replace('_', ' ');
+            predClass.textContent = formattedClass;
+            confValue.textContent = prediction.confidence.toFixed(1);
+            
+            // Theming based on result
+            primaryResultCard.className = 'primary-result-card'; // reset
+            statusRing.className = 'status-ring'; // reset
+            
             if (prediction.is_tumor_detected) {
-                predictionCard.className = 'result-card prediction-card tumor-detected';
-                statusIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-                statusIcon.className = 'status-icon warning';
+                primaryResultCard.classList.add('danger-state');
+                predClass.style.background = 'linear-gradient(to right, #f87171, #ef4444)';
+                predClass.style.color = '#ef4444'; // Fallback color
             } else {
-                predictionCard.className = 'result-card prediction-card no-tumor';
-                statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-                statusIcon.className = 'status-icon success';
+                primaryResultCard.classList.add('success-state');
+                predClass.style.background = 'linear-gradient(to right, #34d399, #10b981)';
+                predClass.style.color = '#10b981'; // Fallback color
+            }
+            // Apply text clip for gradient text effect
+            predClass.style.backgroundClip = 'text';
+            predClass.style.webkitBackgroundClip = 'text';
+            predClass.style.webkitTextFillColor = 'transparent';
+            predClass.style.color = 'transparent';
+            
+            // Confidence Badge Logic
+            if (prediction.confidence > 95) {
+                confBadge.innerHTML = '<i class="fas fa-shield-check"></i> High Confidence';
+                confBadge.className = 'confidence-badge high';
+            } else if (prediction.confidence > 80) {
+                confBadge.innerHTML = '<i class="fas fa-exclamation-circle"></i> Moderate Confidence';
+                confBadge.className = 'confidence-badge medium';
+            } else {
+                confBadge.innerHTML = '<i class="fas fa-question-circle"></i> Low Confidence';
+                confBadge.className = 'confidence-badge low';
             }
 
-            predictionClass.textContent = prediction.class.toUpperCase().replace('_', ' ');
-            confidenceValue.textContent = prediction.confidence.toFixed(2);
+            // 2. Build Probability Bars
+            const probBars = document.getElementById('probabilityBars');
+            probBars.innerHTML = '';
+            
+            // Sort probabilities highest to lowest
+            const sortedProbs = Object.entries(prediction.probabilities)
+                .sort(([, a], [, b]) => b - a);
 
-            // Update probability bars
-            const probabilityBars = document.getElementById('probabilityBars');
-            probabilityBars.innerHTML = '';
-
-            const colors = {
-                'glioma': '#e74c3c',
-                'meningioma': '#3498db',
-                'pituitary': '#9b59b6',
-                'notumor': '#2ecc71'
-            };
-
-            for (const [className, prob] of Object.entries(prediction.probabilities)) {
-                const barContainer = document.createElement('div');
-                barContainer.className = 'bar-container';
-                barContainer.innerHTML = `
-                    <div class="bar-label">
-                        <span>${className}</span>
-                        <span>${prob.toFixed(2)}%</span>
+            // Animate bars in with a slight delay
+            sortedProbs.forEach(([className, prob], index) => {
+                const item = document.createElement('div');
+                item.className = 'prob-item';
+                
+                const percent = prob.toFixed(1);
+                const color = colors[className] || '#a8a29e';
+                const formattedName = className.charAt(0).toUpperCase() + className.slice(1);
+                
+                item.innerHTML = `
+                    <div class="prob-header">
+                        <span class="prob-name">${formattedName}</span>
+                        <span class="prob-value">${percent}%</span>
                     </div>
-                    <div class="bar-bg">
-                        <div class="bar-fill" style="width: ${prob}%; background-color: ${colors[className]}"></div>
+                    <div class="prob-track">
+                        <div class="prob-fill" style="width: 0%; background-color: ${color}; box-shadow: 0 0 10px ${color}"></div>
                     </div>
                 `;
-                probabilityBars.appendChild(barContainer);
-            }
+                probBars.appendChild(item);
+                
+                // Trigger animation reflow
+                setTimeout(() => {
+                    item.querySelector('.prob-fill').style.width = `${prob}%`;
+                }, 100 + (index * 150));
+            });
 
-            // Update tumor info
-            const tumorInfo = document.getElementById('tumorInfo');
-            tumorInfo.innerHTML = `
-                <p><strong>Type:</strong> ${tumor_info.name}</p>
-                <p><strong>Description:</strong> ${tumor_info.description}</p>
-                <p><strong>Severity:</strong> ${tumor_info.severity}</p>
-                ${tumor_info.common_symptoms.length ? `
-                    <p><strong>Common Symptoms:</strong></p>
-                    <ul>
-                        ${tumor_info.common_symptoms.map(s => `<li>${s}</li>`).join('')}
-                    </ul>
-                ` : ''}
+            // 3. Update Tumor Details
+            const tInfo = document.getElementById('tumorInfo');
+            
+            let symptomsHtml = '';
+            if (tumor_info.common_symptoms && tumor_info.common_symptoms.length) {
+                symptomsHtml = `
+                    <div class="info-group">
+                        <span class="info-label">Key Indicators</span>
+                        <div class="symptom-tags">
+                            ${tumor_info.common_symptoms.map(s => `<span class="tag">${s}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            tInfo.innerHTML = `
+                <div class="info-grid">
+                    <div class="info-group">
+                        <span class="info-label">Classification</span>
+                        <span class="info-value text-accent">${tumor_info.name}</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Severity Index</span>
+                        <span class="info-value">${tumor_info.severity}</span>
+                    </div>
+                </div>
+                <div class="info-group full-width">
+                    <span class="info-label">Pathology Profile</span>
+                    <p class="info-desc">${tumor_info.description}</p>
+                </div>
+                ${symptomsHtml}
             `;
 
-            // Update recommendation
-            document.getElementById('recommendation').textContent = tumor_info.recommendation;
-
-            resultsContainer.style.display = 'grid';
+            // 4. Update Recommendation
+            document.getElementById('recommendation').innerHTML = `
+                <div class="rec-alert">
+                    <i class="fas fa-stethoscope"></i>
+                    ${tumor_info.recommendation}
+                </div>
+            `;
         }
     </script>
 </body>
