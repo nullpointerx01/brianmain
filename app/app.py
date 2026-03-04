@@ -288,21 +288,21 @@ def server_error(e):
     return jsonify({'error': 'Internal server error'}), 500
 
 
+# Load model when module is imported (for gunicorn)
+print("Loading model...")
+if load_model():
+    print("✓ Model ready for predictions")
+else:
+    print("⚠ Model not loaded")
+
 if __name__ == '__main__':
     print("="*60)
     print("BRAIN TUMOR DETECTION - WEB APPLICATION")
     print("="*60)
     
-    # Load model at startup
-    print("Loading model...")
-    if load_model():
-        print("✓ Model ready for predictions")
-    else:
-        print("⚠ Model not found - predictions will fail")
-        print("  Train first: python src/train_pytorch.py --model resnet")
-    
+    port = int(os.environ.get('PORT', 5000))
     print("="*60)
-    print(f"Starting server at http://localhost:5000")
+    print(f"Starting server at http://localhost:{port}")
     print("="*60)
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)
