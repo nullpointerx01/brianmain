@@ -39,6 +39,17 @@ jobs:
     - name: Zip artifact for deployment
       run: |
         zip -r release.zip . -x "*.git*" "venv/*" "__pycache__/*" "*.pyc" "data/*" "notebooks/*" "*.ipynb"
+
+    - name: Smoke test - load model
+      run: |
+        echo "Running smoke test: attempt to import app and load model"
+        python - <<'PY'
+import sys, os
+sys.path.append(os.getcwd())
+from app import load_model
+ok = load_model()
+print("load_model returned:", ok)
+PY
     
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
