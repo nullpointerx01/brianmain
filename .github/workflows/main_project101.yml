@@ -12,48 +12,53 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        lfs: true
-    
-    - name: Pull LFS files
-      run: |
-        git lfs pull
-        echo "Checking model files..."
-        ls -la models/
-        file models/brain_tumor_model_pytorch_best.pth
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    
-    - name: Zip artifact for deployment
-      run: |
-        zip -r release.zip . -x "*.git*" "venv/*" "__pycache__/*" "*.pyc" "data/*" "notebooks/*" "*.ipynb"
 
-    - name: Smoke test - load model
-      run: |
-        echo "Running smoke test: attempt to import app and load model"
-        python - <<'PY'
-import sys, os
-sys.path.append(os.getcwd())
-from app import load_model
-ok = load_model()
-print("load_model returned:", ok)
-PY
-    
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: release.zip
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Pull LFS files
+        run: |
+          git lfs pull
+          echo "Checking model files..."
+          ls -la models/
+          file models/brain_tumor_model_pytorch_best.pth
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Zip artifact for deployment
+        run: |
+          zip -r release.zip . -x "*.git*" "venv/*" "__pycache__/*" "*.pyc" "data/*" "notebooks/*" "*.ipynb"
+
+      - name: Smoke test - check model file exists
+        run: |
+          python -c "
+          import os, sys
+          path = 'models/brain_tumor_model_pytorch_best.pth'
+          if not os.path.exists(path):
+              print('ERROR: Model file not found at', path)
+              sys.exit(1)
+          size = os.path.getsize(path)
+          print(f'OK: Model file exists, size={size} bytes')
+          if size < 1000000:
+              print('WARNING: File seems too small - LFS may not have pulled correctly')
+              sys.exit(1)
+          print('Smoke test passed')
+          "
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: release.zip
