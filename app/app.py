@@ -103,36 +103,28 @@ def load_model():
     """Load the PyTorch model"""
     global model, device
     
-    # Force CPU and optimize memory
-    device = torch.device("cpu")
-    torch.set_num_threads(1)  # Limit threads to save memory
-    print(f"Using device: {device}", flush=True)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
     
     # Try to load PyTorch model
     model_path = os.path.join(MODEL_DIR, 'brain_tumor_model_pytorch_best.pth')
     
     if not os.path.exists(model_path):
-        print(f"Model not found at {model_path}", flush=True)
+        print(f"Model not found at {model_path}")
         return False
     
     try:
         # Import model class
         from src.model_pytorch import BrainTumorResNet
         
-        model = BrainTumorResNet(num_classes=4, pretrained=False)
-        checkpoint = torch.load(model_path, map_location='cpu')
+        model = BrainTumorResNet(num_classes=4, pretrained=False).to(device)
+        checkpoint = torch.load(model_path, map_location=device)
         model.load_state_dict(checkpoint['model_state_dict'])
         model.eval()
-        
-        # Clear checkpoint from memory
-        del checkpoint
-        import gc
-        gc.collect()
-        
-        print(f"✓ Model loaded successfully from {model_path}", flush=True)
+        print(f"✓ Model loaded successfully from {model_path}")
         return True
     except Exception as e:
-        print(f"Error loading model: {e}", flush=True)
+        print(f"Error loading model: {e}")
         return False
 
 
@@ -149,7 +141,7 @@ def predict_image(image_path):
     
     # Load and preprocess image
     image = Image.open(image_path).convert('RGB')
-    input_tensor = transform(image).unsqueeze(0)
+    input_tensor = transform(image).unsqueeze(0).to(device)
     
     # Make prediction
     with torch.no_grad():
@@ -297,11 +289,11 @@ def server_error(e):
 
 
 # Load model when module is imported (for gunicorn)
-print("Loading model...", flush=True)
+print("Loading model...")
 if load_model():
-    print("✓ Model ready for predictions", flush=True)
+    print("✓ Model ready for predictions")
 else:
-    print("⚠ Model not loaded", flush=True)
+    print("⚠ Model not loaded")
 
 if __name__ == '__main__':
     print("="*60)
