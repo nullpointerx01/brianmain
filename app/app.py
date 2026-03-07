@@ -289,11 +289,11 @@ def server_error(e):
 
 
 # Load model when module is imported (for gunicorn)
-print("Loading model...")
+print("Loading model...", flush=True)
 if load_model():
-    print("✓ Model ready for predictions")
+    print("✓ Model ready for predictions", flush=True)
 else:
-    print("⚠ Model not loaded")
+    print("⚠ Model not loaded", flush=True)
 
 if __name__ == '__main__':
     print("="*60)

@@ -3,7 +3,7 @@ services:
     name: brain-tumor-detection
     runtime: python
     buildCommand: pip install -r requirements_render.txt
-    startCommand: gunicorn app.app:app --bind 0.0.0.0:$PORT --timeout 120
+    startCommand: gunicorn app.app:app --bind 0.0.0.0:$PORT --timeout 300 --workers 1 --preload
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
