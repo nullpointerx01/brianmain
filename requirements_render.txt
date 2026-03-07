@@ -1,12 +1,12 @@
-# Render deployment requirements (optimized for free tier)
+# Render deployment requirements (optimized for free tier 512MB)
 # Core
 numpy>=1.21.0
 Pillow>=8.0.0
 
-# PyTorch CPU-only (smaller package size)
+# PyTorch CPU-only (minimal)
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch
-torchvision
+torch==2.0.1+cpu
+torchvision==0.15.2+cpu
 
 # Web Application
 flask>=2.0.0
