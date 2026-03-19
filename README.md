@@ -1661,14 +1661,7 @@ This project is licensed under the **Internal Use Only License** for DRDO organi
 - 📧 Email: [support@your-org.com](mailto:support@your-org.com)
 - 🏢 Internal Wiki: [Link to internal documentation]
 
-### Contact Information
 
-| Role | Contact | Email |
-|------|---------|-------|
-| **Project Lead** | Alok Kumar | alok.kumar@srmist.edu.in |
-| **DevOps/Deployment** | [Name] | [email] |
-| **Research** | [Name] | [email] |
-| **Support** | [Department] | support@your-org.com |
 
 ### Reporting Issues
 
